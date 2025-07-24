@@ -9,7 +9,7 @@ interface FilterOptions {
 }
 
 export default class Helper {
-  public static async filter({ model, query, include = [], defaultLimit = 10, concatFields = [] }: FilterOptions) {
+  public static async getFiltered({ model, query, include = [], defaultLimit = 10, concatFields = [] }: FilterOptions) {
     const page = parseInt(query.page) || 1;
     const limit = parseInt(query.limit) || defaultLimit;
     const offset = (page - 1) * limit;

@@ -28,7 +28,7 @@ export class UserController {
 
   public static async read(req: Request, res: Response) {
     try {
-      const result = await Helper.filter({
+      const result = await Helper.getFiltered({
         model: UserModel,
         query: req.query,
         concatFields: ["username", "email", "name"],
