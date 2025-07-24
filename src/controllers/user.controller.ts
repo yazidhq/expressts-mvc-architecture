@@ -1,23 +1,23 @@
 import { Request, Response } from "express";
 import db from "../models";
 
-const User = db.user;
+const UserModel = db.user;
 
-export class userController {
+export class UserController {
   public static async create(req: Request, res: Response) {
     const data = req.body;
 
     try {
-      const created = await User.create(data);
+      const created = await UserModel.create(data);
 
-      res.status(201).json({
+      return res.status(201).json({
         success: true,
         message: "Data created successfully",
         data: created,
-        data_count: 0,
+        dataCount: 0,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},
@@ -27,16 +27,16 @@ export class userController {
 
   public static async read(req: Request, res: Response) {
     try {
-      const data = await User.findAll();
+      const data = await UserModel.findAll();
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Get all data successfully",
         data: data,
-        data_count: data.length,
+        dataCount: data.length,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},
@@ -48,16 +48,16 @@ export class userController {
     const { id } = req.params;
 
     try {
-      const data = await User.findByPk(id);
+      const data = await UserModel.findByPk(id);
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Get one data successfully",
         data: data,
-        data_count: 1,
+        dataCount: 1,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},
@@ -70,17 +70,17 @@ export class userController {
     const { id } = req.params;
 
     try {
-      const old_data = await User.findByPk(id);
+      const old_data = await UserModel.findByPk(id);
       const updated = await old_data?.update(data);
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Data updated successfully",
         data: updated,
-        data_count: 0,
+        dataCount: 0,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},
@@ -92,17 +92,17 @@ export class userController {
     const { id } = req.params;
 
     try {
-      const old_data = await User.findByPk(id);
+      const old_data = await UserModel.findByPk(id);
       const deleted = await old_data?.destroy();
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Data deleted successfully",
         data: deleted,
-        data_count: 0,
+        dataCount: 0,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},
@@ -112,19 +112,19 @@ export class userController {
 
   public static async truncate(req: Request, res: Response) {
     try {
-      const truncated = await User.truncate({
+      const truncated = await UserModel.truncate({
         cascade: true,
         restartIdentity: true,
       });
 
-      res.status(200).json({
+      return res.status(200).json({
         success: true,
         message: "Data truncated successfully",
         data: truncated,
-        data_count: 0,
+        dataCount: 0,
       });
     } catch (error) {
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: `Internal server error: ${error}`,
         data: {},

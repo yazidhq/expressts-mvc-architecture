@@ -19,10 +19,7 @@ app.get("/", (req: Request, res: Response) => {
   res.send("Hello!");
 });
 
-const port =
-  process.env.APP_ENV == "development"
-    ? process.env.APP_PORT_DEV
-    : process.env.APP_PORT_PROD || 3000;
+const port = process.env.APP_ENV == "development" ? process.env.APP_PORT_DEV : process.env.APP_PORT_PROD || 3000;
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
