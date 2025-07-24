@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import db from "../models";
+import Helper from "../helpers";
 
 const UserModel = db.user;
 
@@ -27,13 +28,19 @@ export class UserController {
 
   public static async read(req: Request, res: Response) {
     try {
-      const data = await UserModel.findAll();
+      const result = await Helper.filter({
+        model: UserModel,
+        query: req.query,
+        concatFields: ["username", "email", "name"],
+      });
 
       return res.status(200).json({
         success: true,
         message: "Get all data successfully",
-        data: data,
-        dataCount: data.length,
+        page: result.page,
+        totalPages: result.totalPages,
+        data: result.data,
+        dataCount: result.count,
       });
     } catch (error) {
       return res.status(500).json({
