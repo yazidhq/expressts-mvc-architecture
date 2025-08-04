@@ -1,8 +1,8 @@
 import { Sequelize, DataTypes, Model } from "sequelize";
-import { User } from "../types/user.type";
+import { UserType } from "../types/user.type";
 
 export default (sequelize: Sequelize) => {
-  const User = sequelize.define<Model<User>>("user", {
+  const User = sequelize.define<Model<UserType>>("user", {
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     username: { type: DataTypes.STRING, allowNull: false },
     name: { type: DataTypes.STRING, allowNull: false },
