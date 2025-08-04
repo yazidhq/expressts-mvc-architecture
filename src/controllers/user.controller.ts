@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import db from "../models";
 import Helper from "../helpers";
+import AppError from "../helpers/appError";
 
 const UserModel = db.user;
 
@@ -18,11 +19,7 @@ export class UserController {
         dataCount: 0,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -43,11 +40,7 @@ export class UserController {
         dataCount: result.count,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -64,11 +57,7 @@ export class UserController {
         dataCount: 1,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -87,11 +76,7 @@ export class UserController {
         dataCount: 0,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -109,11 +94,7 @@ export class UserController {
         dataCount: 0,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -131,11 +112,7 @@ export class UserController {
         dataCount: 0,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 }

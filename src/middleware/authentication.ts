@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import db from "../models";
+import AppError from "../helpers/appError";
 
 const UserModel = db.user;
 
@@ -14,11 +15,7 @@ export default class AuthenticationMiddleware {
     }
 
     if (!token) {
-      return res.status(400).json({
-        success: false,
-        message: `Unauthorized`,
-        data: {},
-      });
+      throw new AppError("Unauthorized", 400);
     }
 
     const verified: JwtPayload = jwt.verify(token as string, process.env.JWT_SECRET_KEY as string) as JwtPayload;
@@ -26,11 +23,7 @@ export default class AuthenticationMiddleware {
     const user = userInstance?.get({ plain: true });
 
     if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: `User not found`,
-        data: {},
-      });
+      throw new AppError("User not found", 400);
     }
 
     next();

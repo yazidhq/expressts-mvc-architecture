@@ -76,21 +76,13 @@ export default class AuthController {
       });
 
       if (emailOrUsernameExist) {
-        return res.status(400).json({
-          success: false,
-          message: `Email or username has already registered`,
-          data: {},
-        });
+        throw new AppError("Email or username has already registered", 400);
       }
 
       if (data.password === data.confirmPassword) {
         data.password = bcrypt.hashSync(data.password, 10);
       } else {
-        return res.status(400).json({
-          success: false,
-          message: `Password and password confirmation must be same`,
-          data: {},
-        });
+        throw new AppError("Password and password confirmation must be same", 400);
       }
 
       const user = await UserModel.create(data);
@@ -109,11 +101,7 @@ export default class AuthController {
         dataCount: 0,
       });
     } catch (error) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -131,11 +119,7 @@ export default class AuthController {
       });
 
       if (!user || !(await bcrypt.compare(password, user?.get("password") as string))) {
-        return res.status(401).json({
-          success: false,
-          message: "Invalid credentials",
-          data: {},
-        });
+        throw new AppError("Invalid credentials", 401);
       }
 
       const accessToken = generateAccessToken({ id: user.get("id"), username: user.get("username"), email: user.get("email") });
@@ -150,12 +134,7 @@ export default class AuthController {
         dataCount: 0,
       });
     } catch (error: any) {
-      return res.status(500).json({
-        success: false,
-        message: `Internal server error: ${error}`,
-        data: {},
-        stack: error.stack,
-      });
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
   }
 
@@ -164,31 +143,35 @@ export default class AuthController {
 
     if (!token) throw new AppError("Token is required", 400);
 
-    const storedToken = await RefreshTokenModel.findOne({ where: { token: token } } as any);
-    if (!storedToken || storedToken.getDataValue("expiresAt") < new Date()) {
-      throw new AppError("Token expired or not found", 400);
-    }
-
-    let decoded;
     try {
-      decoded = jwt.verify(token as string, process.env.JWT_REFRESH_SECRET as string);
+      const storedToken = await RefreshTokenModel.findOne({ where: { token: token } } as any);
+      if (!storedToken || storedToken.getDataValue("expiresAt") < new Date()) {
+        throw new AppError("Token expired or not found", 400);
+      }
+
+      let decoded;
+      try {
+        decoded = jwt.verify(token as string, process.env.JWT_REFRESH_SECRET as string);
+      } catch (error) {
+        throw new AppError("Invalid token", 400);
+      }
+
+      const user = await UserModel.findByPk((decoded as any).id);
+      if (!user) throw new AppError("User not found", 400);
+
+      const newAccessToken = generateAccessToken({ id: user?.get("id"), username: user?.get("username"), email: user?.get("email") });
+      const newRefreshToken = generateRefreshToken({ id: user?.get("id"), username: user?.get("username"), email: user?.get("email") });
+      await createRefreshToken(user?.get("id") as number, newRefreshToken);
+
+      const result = { user, newAccessToken, newRefreshToken };
+      return res.status(200).json({
+        success: true,
+        message: "Refresh token generated successfully",
+        data: result,
+        dataCount: 0,
+      });
     } catch (error) {
-      throw new AppError("Invalid token", 400);
+      throw new AppError(`Internal server error: ${error}`, 500);
     }
-
-    const user = await UserModel.findByPk((decoded as any).id);
-    if (!user) throw new AppError("User not found", 400);
-
-    const newAccessToken = generateAccessToken({ id: user?.get("id"), username: user?.get("username"), email: user?.get("email") });
-    const newRefreshToken = generateRefreshToken({ id: user?.get("id"), username: user?.get("username"), email: user?.get("email") });
-    await createRefreshToken(user?.get("id") as number, newRefreshToken);
-
-    const result = { user, newAccessToken, newRefreshToken };
-    return res.status(200).json({
-      success: true,
-      message: "Refresh token generated successfully",
-      data: result,
-      dataCount: 0,
-    });
   }
 }
